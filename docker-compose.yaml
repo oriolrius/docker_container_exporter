@@ -1,0 +1,14 @@
+name: docker_container_exporter
+services:
+  srv:
+    image: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8118
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "${PORT}:8118"
+    privileged: true
