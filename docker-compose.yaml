@@ -1,7 +1,7 @@
 name: docker_container_exporter
 services:
   srv:
-    image: 
+    image: ghcr.io/oriolrius/docker_container_exporter:latest
     build:
       context: .
       dockerfile: Dockerfile
