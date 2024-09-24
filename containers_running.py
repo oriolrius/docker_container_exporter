@@ -5,19 +5,50 @@ from datetime import datetime
 from docker import DockerClient
 from prometheus_client import start_http_server, Gauge
 
+
 def main():
+    """
+    Connects to the Docker daemon via UNIX socket and collects Prometheus metrics for Docker containers.
+
+    This function starts a Prometheus HTTP server on a specified port and continuously updates metrics for the following:
+    - Total number of Docker containers
+    - Number of running Docker containers
+    - Number of stopped Docker containers
+    - Number of Docker containers in other states (not running or stopped)
+
+    The function retrieves all containers, counts them based on their status, and updates the Prometheus gauges accordingly.
+    It also logs the container counts with a timestamp in ISO format.
+
+    If an error occurs while retrieving or updating metrics, the function logs the error with a timestamp in ISO format.
+
+    The function waits for 10 seconds before updating metrics again, and 5 seconds after an error occurs.
+
+    Note: Make sure to have the Docker daemon running and the Prometheus HTTP server accessible on the specified port.
+
+    Raises:
+      Exception: If an error occurs while retrieving or updating metrics.
+
+    """
     # Connect to the Docker daemon via UNIX socket
-    client = DockerClient(base_url='unix://var/run/docker.sock')
+    client = DockerClient(base_url="unix://var/run/docker.sock")
 
     # Define Prometheus metrics to collect
-    total_containers_gauge = Gauge('docker_containers_total', 'Total number of Docker containers')
-    running_containers_gauge = Gauge('docker_containers_running_total', 'Number of running Docker containers')
-    stopped_containers_gauge = Gauge('docker_containers_stopped_total', 'Number of stopped Docker containers')
-    others_containers_gauge = Gauge('docker_containers_other_total', 'Number of Docker containers in other states (not running or stopped)')
+    total_containers_gauge = Gauge(
+        "docker_containers_total", "Total number of Docker containers"
+    )
+    running_containers_gauge = Gauge(
+        "docker_containers_running_total", "Number of running Docker containers"
+    )
+    stopped_containers_gauge = Gauge(
+        "docker_containers_stopped_total", "Number of stopped Docker containers"
+    )
+    others_containers_gauge = Gauge(
+        "docker_containers_other_total",
+        "Number of Docker containers in other states (not running or stopped)",
+    )
 
     # Start the Prometheus HTTP server on the specified port
-    # Start the Prometheus HTTP server on the specified port
-    PORT = int(os.getenv('PORT', 8118))
+    PORT = int(os.getenv("PORT", 9000))
     start_http_server(PORT)
     print(f"Prometheus metrics available at http://localhost:{PORT}/metrics")
 
@@ -36,9 +67,9 @@ def main():
             # Count containers based on their status
             for container in all_containers:
                 status = container.status
-                if status == 'running':
+                if status == "running":
                     running_count += 1
-                elif status == 'exited':
+                elif status == "exited":
                     stopped_count += 1
                 else:
                     others_count += 1
@@ -50,7 +81,9 @@ def main():
 
             # Log the counts with timestamp in ISO format (Line 49)
             current_time = datetime.now().astimezone().isoformat()
-            print(f"{current_time} - Total: {total_count}, Running: {running_count}, Stopped: {stopped_count}, Others: {others_count}")
+            print(
+                f"{current_time} - Total: {total_count}, Running: {running_count}, Stopped: {stopped_count}, Others: {others_count}"
+            )
 
             # Wait before updating metrics again
             time.sleep(10)
@@ -60,5 +93,6 @@ def main():
             print(f"{current_time} - An error occurred: {e}")
             time.sleep(5)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
