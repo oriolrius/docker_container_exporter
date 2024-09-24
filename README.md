@@ -49,7 +49,6 @@ The exporter exposes the following metrics:
 
 1. **Configure the default port:**
 
-
     ```sh
     export PORT=9000
     ```
@@ -112,7 +111,7 @@ prometheus.scrape "node_containers" {
       "__scrape_interval__" = "10s",
      },
   ]
-	forward_to = [prometheus.remote_write.mimir.receiver]
+  forward_to = [prometheus.remote_write.mimir.receiver]
 }
 
 prometheus.remote_write "mimir" {
@@ -123,11 +122,14 @@ prometheus.remote_write "mimir" {
 
 ## Author
 
-Oriol Rius 
+Oriol Rius
+
 - email: <oriol@joor.net>
+
 - https://oriolrius.me - Professional services
+
 - https://oriolrius.cat - Personal blog since, July 2000
 
-## License 
+## License
 
 This project is licensed under the MIT License.
